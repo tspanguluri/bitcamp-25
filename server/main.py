@@ -5,12 +5,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
-
 from spotify import router as spotify
+from chatgpt import router as chatgpt
 
 load_dotenv()
-
-SPOTIFY_KEY = os.getenv('SPOTIFY_CLIENT')
 
 app = FastAPI()
 
@@ -34,6 +32,12 @@ app.include_router(
     tags=["Spotify"]
 )
 
+app.include_router(
+    chatgpt.router,
+    prefix="/chatgpt",
+    tags=["Chatgpt"]
+)
+
 @app.get("/")
 def read_root():
-    return {"message": SPOTIFY_KEY}
+    return {"message": "Hello suckas!"}
