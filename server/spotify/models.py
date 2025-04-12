@@ -8,3 +8,5 @@ class TrackArtistPair(BaseModel):
 class TrackArtistList(BaseModel):
     listings: List[TrackArtistPair]
 
+class SongSpotifyURIs(BaseModel):
+    uris: List[str]

@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 import os
 import httpx
 import base64
-from spotify.models import TrackArtistList
+from spotify.models import TrackArtistList, SongSpotifyURIs
 from urllib.parse import urlencode
 
 router = APIRouter()
@@ -64,9 +64,12 @@ async def search_track(trackArtistList: TrackArtistList):
                 "artist": ", ".join(artist["name"] for artist in track_info["artists"]),
                 "spotify_id": track_info["id"],
                 "spotify_url": track_info["external_urls"]["spotify"],
+                "spotify_uri": track_info["uri"],
                 "images": track_info["album"]["images"],
                 "duration_ms": track_info["duration_ms"]
+
             })
+            # json_lst.append(track_info)
     return json_lst
 
 @router.get("/login")
@@ -114,7 +117,7 @@ async def callback(request: Request):
 
 
 @router.post("/export-playlist")
-async def export_playlist():
+async def export_playlist(songSpotifyURIs: SongSpotifyURIs):
     name = "Bitcamp Playlist"
     public = True
     collaborative = False
@@ -123,7 +126,7 @@ async def export_playlist():
     token = await get_access_token()
     # print("token: ", token)
 
-    authorization_token = "BQD8CU68WStg-wWiJT6QKPXfPxbRkYN7FpssyV87CZ3Lu_bpUUqsh9g3_3iwP2djtiI6PGcxEoIy0Tfhd3KqXjqfUn34blwzym5Txw43eoyhHlhopBtpW4I-u1xmp9DXU7wE_iupQswX6wE9ektNR5lAIUyhCuXwtKMjcLCazwjfhjAds8K7Gn0xoWKyVC3jfDJAWeZ7yaCtAP9MQYxbMqGPTpO_rT1fAkWusGyZPp94QuIdlL2lHVOeDPFBN05plpnQYdlxqo7n5JFz7DtbdR3ODXYgFdlxtg"
+    authorization_token = os.getenv("AUTHORIZATION_TOKEN")
 
     headers = {"Authorization": f"Bearer {authorization_token}"}
     #required: user_id
@@ -136,23 +139,49 @@ async def export_playlist():
         items = resp.json()
 
         id = items["id"]
-    
-    
+
+    url = "https://api.spotify.com/v1/me/playlists"
+    headers = {
+        "Authorization": f"Bearer {authorization_token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "name": name,
+        "description": description,
+        "public": public
+    }
+
     async with httpx.AsyncClient() as client:
-        headers = {"Authorization": f"Bearer {authorization_token}"}
-        data = {
-            "name": "BitCamping"
-        }
-        resp = await client.post(
-            f'https://api.spotify.com/v1/users/{id}/playlists',
-            data=data,
-            headers=headers
-        )
+        res = await client.post(url, json=data, headers=headers)
+        res.raise_for_status()
+        response = res.json()
+        playlist_id = response["id"]
 
-        resp.raise_for_status()
-        response_data = resp.json()
+    
+    headers = {
+        "Authorization": f"Bearer {authorization_token}",
+        "Content-Type": "application/json"
+    }
 
-        return response_data
+    data = {
+        # "uris": [
+        #     "spotify:track:2TjnCxxQRYn56Ye8gkUKiW",
+        # ],
+        "uris": songSpotifyURIs.uris
+    }
+
+    url = f'https://api.spotify.com/v1/playlists/{playlist_id}/tracks'
+
+    async with httpx.AsyncClient() as client:
+        res = await client.post(url, json=data, headers=headers)
+        res.raise_for_status()
+        response = res.json()
+        return response
+
+
+
+
+
 
         # response = await client.post(SPOTIFY_TOKEN_URL, data=data, headers=headers)
         # response.raise_for_status()
