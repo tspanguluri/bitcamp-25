@@ -1,9 +1,14 @@
 # pip install fastapi "uvicorn[standard]"
-# uvicorn main:app --reload
+# uvicorn main:app --reload OR fastapi dev main.py
 
 from fastapi import FastAPI
-from chatgpt import router as chatgpt
 from fastapi.middleware.cors import CORSMiddleware
+import os
+from dotenv import load_dotenv
+from spotify import router as spotify
+from chatgpt import router as chatgpt
+
+load_dotenv()
 
 app = FastAPI()
 
@@ -19,13 +24,20 @@ app.add_middleware(
         "DELETE",
     ],
     allow_headers=["*"]
-
 )
+
+app.include_router(
+    spotify.router,
+    prefix="/spotify",
+    tags=["Spotify"]
+)
+
 app.include_router(
     chatgpt.router,
     prefix="/chatgpt",
     tags=["Chatgpt"]
 )
+
 @app.get("/")
 def read_root():
     return {"message": "Hello suckas!"}
