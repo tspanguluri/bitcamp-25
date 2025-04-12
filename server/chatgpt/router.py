@@ -5,62 +5,60 @@ from dotenv import load_dotenv
 from pathlib import Path
 import json
 import re
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
+# import spotipy
+# from spotipy.oauth2 import SpotifyClientCredentials
 
 router = APIRouter()
-dotenv_path = Path(__file__).resolve().parents[2] / ".env"
-loaded = load_dotenv(dotenv_path=dotenv_path)
+# dotenv_path = Path(__file__).resolve().parents[2] / ".env"
+# loaded = load_dotenv(dotenv_path=dotenv_path)
+load_dotenv()
 api_keyv = os.getenv("OPENAI_API_KEY")
-spotify_client_id = os.getenv("SPOTIFY_CLIENT")
-spotify_client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
+# spotify_client_id = os.getenv("SPOTIFY_CLIENT")
+# spotify_client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
 
-auth_manager = SpotifyClientCredentials(
-    client_id=spotify_client_id,
-    client_secret=spotify_client_secret
-)
-sp = spotipy.Spotify(auth_manager=auth_manager)
+# auth_manager = SpotifyClientCredentials(
+#     client_id=spotify_client_id,
+#     client_secret=spotify_client_secret
+# )
+# sp = spotipy.Spotify(auth_manager=auth_manager)
 
-def get_recommendations(genre: str, artist_name: str = None, min_year: int = None, max_year: int = None):
-    try:
-        kwargs = {"limit": 100}
+# def get_recommendations(genre: str, artist_name: str = None, min_year: int = None, max_year: int = None):
+#     try:
+#         kwargs = {"limit": 100}
 
-        if genre:
-            kwargs["seed_genres"] = [genre]
+#         if genre:
+#             kwargs["seed_genres"] = [genre]
 
-        if artist_name:
-            search = sp.search(q=artist_name, type="artist", limit=1)
-            if search["artists"]["items"]:
-                artist_id = search["artists"]["items"][0]["id"]
-                kwargs["seed_artists"] = [artist_id]
+#         if artist_name:
+#             search = sp.search(q=artist_name, type="artist", limit=1)
+#             if search["artists"]["items"]:
+#                 artist_id = search["artists"]["items"][0]["id"]
+#                 kwargs["seed_artists"] = [artist_id]
 
-        # Spotify doesn't support min_year/max_year directly
-        # We'll simulate year filtering later, so don't pass them here
+#         # Spotify doesn't support min_year/max_year directly
+#         # We'll simulate year filtering later, so don't pass them here
 
-        recommendations = sp.recommendations(**kwargs)
-        filtered_tracks = []
+#         recommendations = sp.recommendations(**kwargs)
+#         filtered_tracks = []
 
-        for track in recommendations["tracks"]:
-            release_year = int(track["album"].get("release_date", "1900")[:4])
-            if (min_year and release_year < min_year) or (max_year and release_year > max_year):
-                continue
-            filtered_tracks.append({
-                "track": track["name"],
-                "artist": track["artists"][0]["name"]
-            })
+#         for track in recommendations["tracks"]:
+#             release_year = int(track["album"].get("release_date", "1900")[:4])
+#             if (min_year and release_year < min_year) or (max_year and release_year > max_year):
+#                 continue
+#             filtered_tracks.append({
+#                 "track": track["name"],
+#                 "artist": track["artists"][0]["name"]
+#             })
 
-        return filtered_tracks
-    except Exception as e:
-        return [{"track": "error", "artist": str(e)}]
+#         return filtered_tracks
+#     except Exception as e:
+#         return [{"track": "error", "artist": str(e)}]
 
 @router.get(
     "/chatgpt",
     status_code=200,
     # response_model=#Create Response Model
 )
-
-
-
 def generate_chatgpt_stuff(mood: str=Query(...), song_num: int=Query(...), genres: str=Query(...),
     artist: str = Query(None),
     min_year: int = Query(None),
@@ -69,12 +67,13 @@ def generate_chatgpt_stuff(mood: str=Query(...), song_num: int=Query(...), genre
    #mood = "happy"
 
    genre = genres.split(",")[0].strip().lower()  
-   spotify_songs = get_recommendations(genre, artist, min_year, max_year)
-   seed_song_list = ", ".join([f"{s['track']} by {s['artist']}" for s in spotify_songs])
-   print(seed_song_list)
+#    spotify_songs = get_recommendations(genre, artist, min_year, max_year)
+#    seed_song_list = ", ".join([f"{s['track']} by {s['artist']}" for s in spotify_songs])
+#    print(seed_song_list)
    this_input = (
-    f"Here are 15 real Spotify songs from the genre '{genre}': {seed_song_list}. "
-    f"Now recommend {song_num} songs that align with the mood '{mood}' and genre '{genre}'. And use a few songs from the list above from Spotify.  "
+    # f"Here are 15 real Spotify songs from the genre '{genre}': {seed_song_list}. "
+    # f"Now recommend {song_num} songs that align with the mood '{mood}' and genre '{genre}'. And use a few songs from the list above from Spotify.  "
+    f"Recommend {song_num} songs that align with the mood \'{mood}\' and genre \'{genre}\'. And generate three colors which align with the mood, and give me the colors' hex values."
     f"Return ONLY a valid JSON object in the following schema:\n\n"
     f"{{\n"
     f"  \"songs\": [\n"

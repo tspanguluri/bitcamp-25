@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-
+const axios = require('axios')
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');                      // Use EJS
@@ -13,12 +13,25 @@ app.get('/', (req, res) => {
 });
 
 
-app.post('/results', (req, res) => {
+app.post('/results', async (req, res) => {
     const mood = req.body.moodInput 
-    const numSongs = req.body.numSongs 
-    const genreType = req.body.genreType 
-    console.log(mood)
-    res.send("HI")
+    const song_num = req.body.numSongs 
+    const genres = req.body.genreType 
+    try {
+        const response = await axios.get('http://localhost:8000/chatgpt/chatgpt', {
+            params: {
+                "mood": mood, 
+                "song_num": song_num, 
+                "genres": genres 
+            }
+        });
+        const results = response.data
+        const songs = results.songs 
+        res.render("results", {songs})
+    } catch (error) {
+        console.log(error)
+    }
+    
 })
 
 // app.post('/res', (req, res)) {
