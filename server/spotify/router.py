@@ -48,10 +48,11 @@ async def search_track(track: str = Query(...), artist: str = Query(...)):
 
 
         track_info = items[0]
-        return {"spotify_id": track_info["id"]}
-
-
-
-#takes the name and artist, and retrives the spotifyID
-
-#takes the spotifyID and retrieves all the info we want about the song
+        return {
+            "track": track_info["name"],
+            "artist": ", ".join(artist["name"] for artist in track_info["artists"]),
+            "spotify_id": track_info["id"],
+            "spotify_url": track_info["external_urls"]["spotify"],
+            "images": track_info["album"]["images"],
+            "duration_ms": track_info["duration_ms"]
+        }
