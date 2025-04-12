@@ -1,6 +1,6 @@
 # pip install fastapi "uvicorn[standard]"
 # uvicorn main:app --reload
-
+import requests
 from fastapi import FastAPI
 
 app = FastAPI()
