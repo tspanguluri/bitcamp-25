@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Welcome Page</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+        <link rel="stylesheet" href="/css/index.css">
+    </head>
+    <body>
+        <h1 class="d-flex justify-content-center mt-3" style="font-size:3rem">Mood-Based Spotify Playlist Generator</h1>
+        <div class="d-flex flex-column align-items-center justify-content-center">
+            <p class="d-flex justify-content-center align-items-center mt-3 mb-5">
+                <button type="button" class="btn color btn-custom fs-5"  data-bs-toggle="modal" data-bs-target="#exampleModal">How it works</button>
+            </p>
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog  modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="exampleModalLabel">Instructions</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        The user enters one or more words to describe their current mood. Based on the input, a Spotify playlist will be auto-compiled and added to the user's Spotify libary, should they provide their credentials.
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="d-flex flex-column align-items-center">
+              <div class="mb-3">
+                <form id="inputDetails" action="/results" method="POST" class="d-flex gap-2 flex-column"> 
+                    <input type="text" class="form-control fs-5" name="moodInput" placeholder="Current Mood" style="width: 20rem; height: 5rem;">
+                    <input type="number" class="form-control fs-5" name="numSongs" placeholder="Number of Songs" min="1" style="width: 20rem; height: 5rem;">
+                    <input type="text" class="form-control fs-5" name="genreType" placeholder="Genre Type" style="width: 20rem; height: 5rem;">
+                    <button type="submit" class="btn btn-inst btn-custom fs-5" id="submitButton">See your playlist!</button>
+                </form>
+              </div>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+        <script>
+            document.getElementById("submitButton").addEventListener("click", async function() {
+                const mood = document.getElementById("moodInput").value;
+                const numSongs = document.getElementById("numSongs").value;
+                const genre = document.getElementById("genreType").value;
+
+                const formData = new FormData();
+                formData.append("moodInput", mood);
+                formData.append("numSongs", numSongs);
+                formData.append("genreType", genre);
+
+                
+            })
+        </script>
+    </body>
+</html>

@@ -1,0 +1,16 @@
+html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+.btn-custom {
+    background-color: #1ed760;
+    font-weight: bolder;
+    
+}
+
+.btn-custom:hover {
+    background-color: #fff; 
+    border-color: green;
+    border-width: 2px;
+}
