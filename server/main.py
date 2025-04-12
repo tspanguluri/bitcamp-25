@@ -3,8 +3,14 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import os
+from dotenv import load_dotenv
 
 from spotify import router as spotify
+
+load_dotenv()
+
+SPOTIFY_KEY = os.getenv('SPOTIFY_CLIENT')
 
 app = FastAPI()
 
@@ -25,9 +31,9 @@ app.add_middleware(
 app.include_router(
     spotify.router,
     prefix="/spotify",
-    tags="Spotify"
+    tags=["Spotify"]
 )
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello suckas!"}
+    return {"message": SPOTIFY_KEY}
