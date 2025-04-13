@@ -44,17 +44,33 @@ async def search_track(trackArtistList: TrackArtistList):
 
     headers = {"Authorization": f"Bearer {token}"}
 
+    def ms_to_ss(duration):
+        total_seconds = duration//1000
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        return f"{minutes}:{seconds:02}"
 
     json_lst = []
     for listing in trackArtistList.listings:
-        query = f"track:{listing.track} artist:{listing.artist}"
+        clean_artist = listing.artist.split(" ft.")[0].split(" &")[0].strip()
+        query = f"track:{listing.track} artist:{clean_artist}"
         async with httpx.AsyncClient() as client:
-            resp = await client.get(
-                "https://api.spotify.com/v1/search",
-                params={"q": query, "type": "track", "limit": 1},
-                headers=headers,
-            )
-            resp.raise_for_status()
+            try:
+                resp = await client.get(
+                    "https://api.spotify.com/v1/search",
+                    params = {
+                        "q": f'track:"{listing.track}" artist:"{clean_artist}"',
+                        "type": "track",
+                        "limit": 1
+                    },
+                    headers=headers,
+                    timeout=15.0
+                )
+                resp.raise_for_status()
+            except httpx.HTTPStatusError as e:
+                print(f"⚠️ Bad Spotify response for query: {query}")
+                print(e)
+                continue
             items = resp.json()["tracks"]["items"]
             if not items:
                 raise HTTPException(status_code=404, detail="Track not found")
@@ -66,10 +82,10 @@ async def search_track(trackArtistList: TrackArtistList):
                 "spotify_url": track_info["external_urls"]["spotify"],
                 "spotify_uri": track_info["uri"],
                 "images": track_info["album"]["images"],
-                "duration_ms": track_info["duration_ms"]
-
+                "duration_ms": ms_to_ss(track_info["duration_ms"])
             })
             # json_lst.append(track_info)
+    print("about to return")
     return json_lst
 
 @router.get("/login")

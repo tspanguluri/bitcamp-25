@@ -18,14 +18,28 @@
 
             <div class="container">
                 <div class="vstack gap-2 col-md-5 mx-auto">
-                    <div class="d-flex gap-2">
-                        <button type="button" disabled class="btn w-100 border border-black">Save changes</button>
-                        <button type="button" class="btn w-20 h-50 border border-black icon"><img src="/imgs/spotify.svg" alt="Spotify Icon" width="50rem" height="50rem"  /></button>
-                        <button type="button" class="btn w-20 h-50 border border-black icon"><img src="/imgs/cancel.svg" alt="Spotify Icon" width="50rem" height="50rem" /></button>
-                    </div>
                     <% for (let i = 0; i < songs.length; i++) { %>
-                        <li><%= songs[i].track %> - <%= songs[i].artist %> years old</li>
-                      <% } %>
+                        <div class="d-flex gap-2 mb-3">
+                          <button type="button" disabled class="btn border border-black music" style="font-weight: bold; background-color: <%= songs[i].backgroundColor %>">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <img src=<%= songs[i].images[2].url%>> 
+                                <span>
+                                    <%= songs[i].track %> — <%= songs[i].artist %>
+                                </span>
+                                <span class="d-flex align-self-start">
+                                    <!-- <%= (songs[i].duration_ms / 60000) + ":" + (songs[i].duration_ms - songs[i].duration_ms / 60000)*60 %> -->
+                                    <%= songs[i].duration_ms %>
+                                </span>
+                            </div>
+                          </button>
+                          <button type="button" class="btn w-20 border border-black icon">
+                            <img src="/imgs/spotify.svg" alt="Spotify Icon" width="50rem" height="50rem" />
+                          </button>
+                          <button type="button" class="btn w-20 border border-black icon">
+                            <img src="/imgs/cancel.svg" alt="Cancel Icon" width="50rem" height="50rem" />
+                          </button>
+                        </div>
+                      <% } %>                      
                     <button type="button" class="btn border border-black op-button">Export to Spotify</button>
                     <button type="button" class="btn border border-black op-button">Go Back</button>
                   </div>
